@@ -98,6 +98,49 @@ header h1 {
     gap: 12px;
     position: relative;
     z-index: 1;
+    margin-bottom: 15px;
+}
+
+/* 리소스 표시 */
+.resources {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.resource-item {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 8px 20px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.resource-icon {
+    font-size: 1.3em;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+}
+
+.resource-label {
+    font-weight: 600;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    font-size: 0.95em;
+}
+
+.resource-value {
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    font-size: 1.1em;
+    min-width: 60px;
+    text-align: right;
 }
 
 #petNameDisplay {
@@ -762,6 +805,95 @@ header h1 {
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
+/* 상점 영역 */
+.shop-area {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.08),
+        inset 0 1px 2px rgba(255, 255, 255, 0.8);
+    margin-bottom: 20px;
+}
+
+.shop-title {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+.shop-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #ffb347 0%, #ff9a00 100%);
+    border: none;
+    color: white;
+    padding: 18px 20px;
+    border-radius: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    box-shadow:
+        0 6px 18px rgba(255, 154, 0, 0.35),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.shop-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.shop-btn:hover::before {
+    left: 100%;
+}
+
+.shop-btn:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 10px 25px rgba(255, 154, 0, 0.45),
+        inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.shop-btn:active {
+    transform: translateY(0);
+}
+
+.shop-icon {
+    font-size: 2.5em;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.shop-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
+}
+
+.shop-name {
+    font-size: 1.1em;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.shop-desc {
+    font-size: 0.9em;
+    opacity: 0.9;
+    margin-top: 3px;
+}
+
 /* 푸터 */
 footer {
     background: linear-gradient(180deg, #fafbff 0%, #f5f7fa 100%);
@@ -913,6 +1045,57 @@ footer {
     50% { opacity: 0.6; filter: brightness(0.7); }
 }
 
+/* 토스트 메시지 */
+.toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: white;
+    color: #333;
+    padding: 15px 30px;
+    border-radius: 25px;
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.2),
+        0 0 0 2px rgba(0, 0, 0, 0.05);
+    font-weight: 700;
+    font-size: 1em;
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    max-width: 90%;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    box-shadow:
+        0 10px 30px rgba(56, 239, 125, 0.4),
+        0 0 0 2px rgba(56, 239, 125, 0.2);
+}
+
+.toast-warning {
+    background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+    color: white;
+    box-shadow:
+        0 10px 30px rgba(255, 210, 0, 0.4),
+        0 0 0 2px rgba(255, 210, 0, 0.2);
+}
+
+.toast-error {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    color: white;
+    box-shadow:
+        0 10px 30px rgba(235, 51, 73, 0.4),
+        0 0 0 2px rgba(235, 51, 73, 0.2);
+}
+
 /* 반응형 디자인 */
 @media (max-width: 600px) {
     .stats-area {
@@ -925,6 +1108,11 @@ footer {
 
     header h1 {
         font-size: 1.5em;
+    }
+
+    .resources {
+        flex-direction: column;
+        gap: 8px;
     }
 
     footer {

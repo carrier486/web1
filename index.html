@@ -14,6 +14,18 @@
                 <span id="petNameDisplay">멍멍이</span>
                 <button id="changeName" class="small-btn">이름 변경</button>
             </div>
+            <div class="resources">
+                <div class="resource-item">
+                    <span class="resource-icon">💰</span>
+                    <span class="resource-label">캐시:</span>
+                    <span id="cashDisplay" class="resource-value">20,000</span>
+                </div>
+                <div class="resource-item">
+                    <span class="resource-icon">🍖</span>
+                    <span class="resource-label">먹이:</span>
+                    <span id="foodDisplay" class="resource-value">0</span>
+                </div>
+            </div>
         </header>
 
         <div class="main-game">
@@ -96,6 +108,18 @@
                 <button id="sleepBtn" class="action-btn sleep">
                     <span class="btn-icon">😴</span>
                     <span class="btn-text">재우기</span>
+                </button>
+            </div>
+
+            <!-- 상점 영역 -->
+            <div class="shop-area">
+                <h3 class="shop-title">🏪 상점</h3>
+                <button id="buyFoodBtn" class="shop-btn">
+                    <span class="shop-icon">🍖</span>
+                    <div class="shop-info">
+                        <span class="shop-name">먹이 구매</span>
+                        <span class="shop-desc">15개 • 10,000 캐시</span>
+                    </div>
                 </button>
             </div>
         </div>

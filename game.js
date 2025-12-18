@@ -11,6 +11,10 @@ class PetGame {
         this.gameStartTime = Date.now();
         this.lastUpdateTime = Date.now();
 
+        // 재화 시스템
+        this.cash = 20000; // 기본 캐시
+        this.food = 0; // 먹이 개수
+
         // 실제 강아지 이미지 목록 (Unsplash에서 무료 강아지 이미지)
         this.dogImages = [
             'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop',
@@ -44,6 +48,10 @@ class PetGame {
         this.gameTimeDisplay = document.getElementById('gameTime');
         this.petNameDisplay = document.getElementById('petNameDisplay');
 
+        // 재화 표시 요소
+        this.cashDisplay = document.getElementById('cashDisplay');
+        this.foodDisplay = document.getElementById('foodDisplay');
+
         // 강아지 이미지 랜덤 설정 (저장된 이미지가 없으면)
         if (!this.selectedDogImage) {
             this.selectedDogImage = this.dogImages[Math.floor(Math.random() * this.dogImages.length)];
@@ -56,6 +64,7 @@ class PetGame {
         document.getElementById('bathBtn').addEventListener('click', () => this.bath());
         document.getElementById('playBtn').addEventListener('click', () => this.play());
         document.getElementById('sleepBtn').addEventListener('click', () => this.sleep());
+        document.getElementById('buyFoodBtn').addEventListener('click', () => this.buyFood());
         document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
         document.getElementById('changeName').addEventListener('click', () => this.changePetName());
 
@@ -86,10 +95,19 @@ class PetGame {
 
     // 먹이기
     feed() {
+        // 먹이가 없는 경우
+        if (this.food <= 0) {
+            this.showToast('먹이가 부족해요! 상점에서 구매하세요 🛒', 'warning');
+            return;
+        }
+
         if (this.stats.hunger >= 95) {
             this.showMessage('배가 안 고파요! 😊');
             return;
         }
+
+        // 먹이 1개 소모
+        this.food--;
 
         this.stats.hunger = Math.min(100, this.stats.hunger + 30);
         this.stats.happy = Math.min(100, this.stats.happy + 10);
@@ -99,6 +117,28 @@ class PetGame {
         this.showMessage('맛있어요! 🍖');
         this.updateDisplay();
         this.saveGame();
+    }
+
+    // 먹이 구매
+    buyFood() {
+        const foodPrice = 10000;
+        const foodAmount = 15;
+
+        // 캐시가 부족한 경우
+        if (this.cash < foodPrice) {
+            this.showToast('캐시가 부족합니다! 충전이 필요해요 💰', 'error');
+            return;
+        }
+
+        // 구매 확인
+        if (confirm(`먹이 ${foodAmount}개를 ${foodPrice.toLocaleString()} 캐시에 구매하시겠습니까?`)) {
+            this.cash -= foodPrice;
+            this.food += foodAmount;
+
+            this.showToast(`먹이 ${foodAmount}개를 구매했어요! 🎉`, 'success');
+            this.updateDisplay();
+            this.saveGame();
+        }
     }
 
     // 산책하기
@@ -196,6 +236,34 @@ class PetGame {
         }, 2000);
     }
 
+    // 토스트 메시지 표시
+    showToast(message, type = 'info') {
+        // 기존 토스트 제거
+        const existingToast = document.querySelector('.toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+
+        // 새 토스트 생성
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        // 애니메이션
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+
+        // 3초 후 제거
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+
     // 화면 업데이트
     updateDisplay() {
         // 상태 바 업데이트
@@ -203,6 +271,10 @@ class PetGame {
         this.updateStatBar(this.cleanBar, this.cleanValue, this.stats.clean);
         this.updateStatBar(this.happyBar, this.happyValue, this.stats.happy);
         this.updateStatBar(this.energyBar, this.energyValue, this.stats.energy);
+
+        // 재화 표시 업데이트
+        this.cashDisplay.textContent = this.cash.toLocaleString();
+        this.foodDisplay.textContent = this.food;
 
         // 강아지 상태 이모지 업데이트
         this.updateStatusEmoji();
@@ -269,7 +341,9 @@ class PetGame {
             petName: this.petName,
             gameStartTime: this.gameStartTime,
             lastUpdateTime: this.lastUpdateTime,
-            selectedDogImage: this.selectedDogImage
+            selectedDogImage: this.selectedDogImage,
+            cash: this.cash,
+            food: this.food
         };
         localStorage.setItem('petGameSave', JSON.stringify(gameData));
     }
@@ -285,6 +359,8 @@ class PetGame {
                 this.gameStartTime = gameData.gameStartTime;
                 this.lastUpdateTime = gameData.lastUpdateTime;
                 this.selectedDogImage = gameData.selectedDogImage;
+                this.cash = gameData.cash !== undefined ? gameData.cash : 20000;
+                this.food = gameData.food !== undefined ? gameData.food : 0;
 
                 // 부재중 시간 계산
                 const now = Date.now();
@@ -320,6 +396,8 @@ class PetGame {
             this.petName = '멍멍이';
             this.gameStartTime = Date.now();
             this.lastUpdateTime = Date.now();
+            this.cash = 20000;
+            this.food = 0;
 
             // 새로운 강아지 이미지 랜덤 선택
             this.selectedDogImage = this.dogImages[Math.floor(Math.random() * this.dogImages.length)];
