@@ -92,11 +92,24 @@ header h1 {
 .pet-character {
     position: relative;
     animation: breathe 2s ease-in-out infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dog-image {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    border: 8px solid white;
+    transition: all 0.3s ease;
 }
 
 @keyframes breathe {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.03); }
+    50% { transform: scale(1.05); }
 }
 
 /* 강아지 얼굴 */
@@ -550,51 +563,99 @@ footer {
     animation: eating 1s ease-in-out;
 }
 
+.pet-character.feeding .dog-image {
+    animation: eatingSpin 1s ease-in-out;
+}
+
 @keyframes eating {
     0%, 100% { transform: scale(1); }
-    25% { transform: scale(1.05) rotate(5deg); }
-    50% { transform: scale(1.05) rotate(-5deg); }
-    75% { transform: scale(1.05) rotate(5deg); }
+    25% { transform: scale(1.1) rotate(5deg); }
+    50% { transform: scale(1.1) rotate(-5deg); }
+    75% { transform: scale(1.1) rotate(5deg); }
+}
+
+@keyframes eatingSpin {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
 }
 
 .pet-character.walking {
     animation: walking 2s ease-in-out;
 }
 
+.pet-character.walking .dog-image {
+    animation: walkingBounce 2s ease-in-out;
+}
+
 @keyframes walking {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-20px); }
-    50% { transform: translateX(20px); }
-    75% { transform: translateX(-10px); }
+    25% { transform: translateX(-30px); }
+    50% { transform: translateX(30px); }
+    75% { transform: translateX(-15px); }
+}
+
+@keyframes walkingBounce {
+    0%, 100% { transform: translateY(0); }
+    25%, 75% { transform: translateY(-10px); }
+    50% { transform: translateY(0); }
 }
 
 .pet-character.bathing {
     animation: shake 1s ease-in-out;
 }
 
+.pet-character.bathing .dog-image {
+    animation: shakeImage 1s ease-in-out;
+}
+
 @keyframes shake {
     0%, 100% { transform: rotate(0); }
-    25% { transform: rotate(-10deg); }
-    50% { transform: rotate(10deg); }
-    75% { transform: rotate(-10deg); }
+    25% { transform: rotate(-15deg); }
+    50% { transform: rotate(15deg); }
+    75% { transform: rotate(-15deg); }
+}
+
+@keyframes shakeImage {
+    0%, 100% { transform: rotate(0); filter: brightness(1); }
+    25% { transform: rotate(-10deg); filter: brightness(1.2); }
+    50% { transform: rotate(10deg); filter: brightness(1.2); }
+    75% { transform: rotate(-10deg); filter: brightness(1.2); }
 }
 
 .pet-character.playing {
     animation: jump 1s ease-in-out;
 }
 
+.pet-character.playing .dog-image {
+    animation: jumpSpin 1s ease-in-out;
+}
+
 @keyframes jump {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-30px); }
+    50% { transform: translateY(-40px); }
+}
+
+@keyframes jumpSpin {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(360deg) scale(1.15); }
 }
 
 .pet-character.sleeping {
     animation: sleep 2s ease-in-out;
 }
 
+.pet-character.sleeping .dog-image {
+    animation: sleepFade 2s ease-in-out;
+}
+
 @keyframes sleep {
     0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(0.95); opacity: 0.7; }
+    50% { transform: scale(0.95); opacity: 0.8; }
+}
+
+@keyframes sleepFade {
+    0%, 100% { opacity: 1; filter: brightness(1); }
+    50% { opacity: 0.6; filter: brightness(0.7); }
 }
 
 /* 반응형 디자인 */

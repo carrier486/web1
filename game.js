@@ -11,6 +11,15 @@ class PetGame {
         this.gameStartTime = Date.now();
         this.lastUpdateTime = Date.now();
 
+        // 실제 강아지 이미지 목록 (Unsplash에서 무료 강아지 이미지)
+        this.dogImages = [
+            'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1552053831-71594a27632d?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?w=400&h=400&fit=crop',
+            'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&h=400&fit=crop'
+        ];
+
         this.loadGame();
         this.init();
         this.startGameLoop();
@@ -29,10 +38,17 @@ class PetGame {
         this.energyValue = document.getElementById('energyValue');
 
         this.petCharacter = document.getElementById('petCharacter');
+        this.dogImage = document.getElementById('dogImage');
         this.statusEmoji = document.getElementById('statusEmoji');
         this.actionMessage = document.getElementById('actionMessage');
         this.gameTimeDisplay = document.getElementById('gameTime');
         this.petNameDisplay = document.getElementById('petNameDisplay');
+
+        // 강아지 이미지 랜덤 설정 (저장된 이미지가 없으면)
+        if (!this.selectedDogImage) {
+            this.selectedDogImage = this.dogImages[Math.floor(Math.random() * this.dogImages.length)];
+        }
+        this.dogImage.src = this.selectedDogImage;
 
         // 버튼 이벤트 리스너
         document.getElementById('feedBtn').addEventListener('click', () => this.feed());
@@ -252,7 +268,8 @@ class PetGame {
             stats: this.stats,
             petName: this.petName,
             gameStartTime: this.gameStartTime,
-            lastUpdateTime: this.lastUpdateTime
+            lastUpdateTime: this.lastUpdateTime,
+            selectedDogImage: this.selectedDogImage
         };
         localStorage.setItem('petGameSave', JSON.stringify(gameData));
     }
@@ -267,6 +284,7 @@ class PetGame {
                 this.petName = gameData.petName;
                 this.gameStartTime = gameData.gameStartTime;
                 this.lastUpdateTime = gameData.lastUpdateTime;
+                this.selectedDogImage = gameData.selectedDogImage;
 
                 // 부재중 시간 계산
                 const now = Date.now();
@@ -302,9 +320,14 @@ class PetGame {
             this.petName = '멍멍이';
             this.gameStartTime = Date.now();
             this.lastUpdateTime = Date.now();
+
+            // 새로운 강아지 이미지 랜덤 선택
+            this.selectedDogImage = this.dogImages[Math.floor(Math.random() * this.dogImages.length)];
+            this.dogImage.src = this.selectedDogImage;
+
             this.petNameDisplay.textContent = this.petName;
             this.updateDisplay();
-            this.showMessage('새로운 시작! 🎉');
+            this.showMessage('새로운 강아지와 함께! 🎉');
         }
     }
 }
