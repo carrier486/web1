@@ -1,0 +1,618 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.game-container {
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 800px;
+    width: 100%;
+    overflow: hidden;
+}
+
+header {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    padding: 20px 30px;
+    text-align: center;
+    color: white;
+}
+
+header h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.pet-name {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+#petNameDisplay {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.small-btn {
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid white;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s;
+}
+
+.small-btn:hover {
+    background: white;
+    color: #f5576c;
+    transform: scale(1.05);
+}
+
+.main-game {
+    padding: 30px;
+}
+
+/* 강아지 캐릭터 영역 */
+.pet-area {
+    background: linear-gradient(180deg, #a8edea 0%, #fed6e3 100%);
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 30px;
+    position: relative;
+    min-height: 350px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pet-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pet-character {
+    position: relative;
+    animation: breathe 2s ease-in-out infinite;
+}
+
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+
+/* 강아지 얼굴 */
+.dog-face {
+    position: relative;
+    z-index: 2;
+}
+
+.dog-ears {
+    position: absolute;
+    top: -20px;
+    width: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.ear {
+    position: absolute;
+    width: 50px;
+    height: 80px;
+    background: linear-gradient(135deg, #d4a574 0%, #b8926a 100%);
+    border-radius: 50% 50% 40% 40%;
+    box-shadow: inset -3px -3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.ear.left {
+    left: 0;
+    transform: rotate(-25deg);
+    animation: earWiggle 3s ease-in-out infinite;
+}
+
+.ear.right {
+    right: 0;
+    transform: rotate(25deg);
+    animation: earWiggle 3s ease-in-out infinite 0.5s;
+}
+
+@keyframes earWiggle {
+    0%, 100% { transform: rotate(-25deg); }
+    50% { transform: rotate(-30deg); }
+}
+
+.ear.right {
+    animation: earWiggleRight 3s ease-in-out infinite 0.5s;
+}
+
+@keyframes earWiggleRight {
+    0%, 100% { transform: rotate(25deg); }
+    50% { transform: rotate(30deg); }
+}
+
+.dog-head {
+    width: 160px;
+    height: 180px;
+    background: linear-gradient(135deg, #f5deb3 0%, #daa86e 100%);
+    border-radius: 50% 50% 60% 60%;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* 눈 */
+.eyes {
+    position: absolute;
+    top: 50px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    padding: 0 30px;
+}
+
+.eye {
+    width: 30px;
+    height: 35px;
+    background: white;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+    animation: blink 4s infinite;
+}
+
+@keyframes blink {
+    0%, 96%, 100% { height: 35px; }
+    98% { height: 3px; }
+}
+
+.pupil {
+    width: 15px;
+    height: 15px;
+    background: #2c3e50;
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.pupil::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+}
+
+/* 코 */
+.nose {
+    position: absolute;
+    width: 25px;
+    height: 20px;
+    background: #3e2723;
+    border-radius: 50% 50% 50% 50%;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.nose::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 15px;
+    background: #3e2723;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* 입 */
+.mouth {
+    position: absolute;
+    width: 60px;
+    height: 30px;
+    border: 3px solid #3e2723;
+    border-top: none;
+    border-radius: 0 0 60px 60px;
+    top: 115px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.mouth::before,
+.mouth::after {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 20px;
+    border: 3px solid #3e2723;
+    border-top: none;
+    border-right: none;
+    border-radius: 0 0 0 20px;
+    top: -3px;
+}
+
+.mouth::before {
+    left: -3px;
+}
+
+.mouth::after {
+    right: -3px;
+    transform: scaleX(-1);
+}
+
+/* 혀 */
+.tongue {
+    position: absolute;
+    width: 30px;
+    height: 25px;
+    background: #ff6b9d;
+    border-radius: 0 0 50% 50%;
+    top: 135px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: tongueWag 2s ease-in-out infinite;
+}
+
+@keyframes tongueWag {
+    0%, 100% { transform: translateX(-50%) scaleY(1); }
+    50% { transform: translateX(-50%) scaleY(1.1); }
+}
+
+/* 강아지 몸 */
+.dog-body {
+    position: relative;
+    width: 140px;
+    height: 100px;
+    background: linear-gradient(135deg, #f5deb3 0%, #daa86e 100%);
+    border-radius: 40% 40% 30% 30%;
+    margin-top: -20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* 다리 */
+.legs {
+    position: absolute;
+    width: 100%;
+    bottom: -40px;
+}
+
+.leg {
+    position: absolute;
+    width: 20px;
+    height: 50px;
+    background: linear-gradient(135deg, #daa86e 0%, #b8926a 100%);
+    border-radius: 10px 10px 20px 20px;
+}
+
+.leg.front-left {
+    left: 20px;
+    animation: legWalk 1s ease-in-out infinite;
+}
+
+.leg.front-right {
+    left: 50px;
+    animation: legWalk 1s ease-in-out infinite 0.5s;
+}
+
+.leg.back-left {
+    right: 50px;
+    animation: legWalk 1s ease-in-out infinite 0.5s;
+}
+
+.leg.back-right {
+    right: 20px;
+    animation: legWalk 1s ease-in-out infinite;
+}
+
+@keyframes legWalk {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* 꼬리 */
+.tail {
+    position: absolute;
+    width: 15px;
+    height: 50px;
+    background: linear-gradient(135deg, #daa86e 0%, #b8926a 100%);
+    border-radius: 50%;
+    bottom: 30px;
+    right: -10px;
+    transform-origin: top center;
+    animation: tailWag 0.8s ease-in-out infinite;
+}
+
+@keyframes tailWag {
+    0%, 100% { transform: rotate(20deg); }
+    50% { transform: rotate(-20deg); }
+}
+
+/* 상태 이모지 */
+.status-emoji {
+    font-size: 3em;
+    margin-top: 20px;
+    animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* 액션 메시지 */
+.action-message {
+    position: absolute;
+    top: -30px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: #f5576c;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.action-message.show {
+    opacity: 1;
+    animation: messageFloat 2s ease-out forwards;
+}
+
+@keyframes messageFloat {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-30px); opacity: 0; }
+}
+
+/* 상태 바 영역 */
+.stats-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.stat-item {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.stat-icon {
+    font-size: 1.5em;
+}
+
+.stat-label {
+    font-weight: bold;
+    color: #333;
+    font-size: 1.1em;
+}
+
+.stat-bar-container {
+    background: rgba(255, 255, 255, 0.6);
+    height: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 5px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.stat-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+    border-radius: 10px;
+    transition: width 0.5s, background 0.3s;
+    box-shadow: 0 0 10px rgba(56, 239, 125, 0.5);
+}
+
+.stat-bar.low {
+    background: linear-gradient(90deg, #eb3349 0%, #f45c43 100%);
+    box-shadow: 0 0 10px rgba(235, 51, 73, 0.5);
+}
+
+.stat-bar.medium {
+    background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%);
+    box-shadow: 0 0 10px rgba(255, 210, 0, 0.5);
+}
+
+.stat-value {
+    font-weight: bold;
+    color: #555;
+    float: right;
+}
+
+/* 액션 버튼 영역 */
+.actions-area {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.action-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}
+
+.action-btn.feed {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.action-btn.walk {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.action-btn.bath {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.action-btn.play {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.action-btn.sleep {
+    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+}
+
+.btn-icon {
+    font-size: 2em;
+}
+
+.btn-text {
+    font-size: 0.9em;
+}
+
+/* 푸터 */
+footer {
+    background: #f5f7fa;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #e0e0e0;
+}
+
+.time-display {
+    font-weight: bold;
+    color: #555;
+}
+
+.reset-btn {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    box-shadow: 0 3px 10px rgba(235, 51, 73, 0.3);
+}
+
+.reset-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(235, 51, 73, 0.5);
+}
+
+/* 강아지 액션 애니메이션 */
+.pet-character.feeding {
+    animation: eating 1s ease-in-out;
+}
+
+@keyframes eating {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.05) rotate(5deg); }
+    50% { transform: scale(1.05) rotate(-5deg); }
+    75% { transform: scale(1.05) rotate(5deg); }
+}
+
+.pet-character.walking {
+    animation: walking 2s ease-in-out;
+}
+
+@keyframes walking {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-20px); }
+    50% { transform: translateX(20px); }
+    75% { transform: translateX(-10px); }
+}
+
+.pet-character.bathing {
+    animation: shake 1s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+    75% { transform: rotate(-10deg); }
+}
+
+.pet-character.playing {
+    animation: jump 1s ease-in-out;
+}
+
+@keyframes jump {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-30px); }
+}
+
+.pet-character.sleeping {
+    animation: sleep 2s ease-in-out;
+}
+
+@keyframes sleep {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.95); opacity: 0.7; }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 600px) {
+    .stats-area {
+        grid-template-columns: 1fr;
+    }
+
+    .actions-area {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    header h1 {
+        font-size: 1.5em;
+    }
+
+    footer {
+        flex-direction: column;
+        gap: 15px;
+    }
+}

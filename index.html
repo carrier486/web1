@@ -1,6 +1,141 @@
-<meta charset="utf-8">
-<html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐶 나의 강아지 키우기</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-  hello
+    <div class="game-container">
+        <header>
+            <h1>🏠 나의 강아지 키우기</h1>
+            <div class="pet-name">
+                <span id="petNameDisplay">멍멍이</span>
+                <button id="changeName" class="small-btn">이름 변경</button>
+            </div>
+        </header>
+
+        <div class="main-game">
+            <!-- 강아지 캐릭터 영역 -->
+            <div class="pet-area">
+                <div class="pet-container">
+                    <div id="petCharacter" class="pet-character">
+                        <div class="dog-face">
+                            <div class="dog-ears">
+                                <div class="ear left"></div>
+                                <div class="ear right"></div>
+                            </div>
+                            <div class="dog-head">
+                                <div class="eyes">
+                                    <div class="eye left">
+                                        <div class="pupil"></div>
+                                    </div>
+                                    <div class="eye right">
+                                        <div class="pupil"></div>
+                                    </div>
+                                </div>
+                                <div class="nose"></div>
+                                <div class="mouth"></div>
+                                <div class="tongue"></div>
+                            </div>
+                        </div>
+                        <div class="dog-body">
+                            <div class="legs">
+                                <div class="leg front-left"></div>
+                                <div class="leg front-right"></div>
+                                <div class="leg back-left"></div>
+                                <div class="leg back-right"></div>
+                            </div>
+                            <div class="tail"></div>
+                        </div>
+                    </div>
+                    <div id="statusEmoji" class="status-emoji">😊</div>
+                    <div id="actionMessage" class="action-message"></div>
+                </div>
+            </div>
+
+            <!-- 상태 바 영역 -->
+            <div class="stats-area">
+                <div class="stat-item">
+                    <div class="stat-header">
+                        <span class="stat-icon">🍖</span>
+                        <span class="stat-label">배고픔</span>
+                    </div>
+                    <div class="stat-bar-container">
+                        <div id="hungerBar" class="stat-bar" style="width: 100%"></div>
+                    </div>
+                    <span id="hungerValue" class="stat-value">100</span>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-header">
+                        <span class="stat-icon">✨</span>
+                        <span class="stat-label">청결도</span>
+                    </div>
+                    <div class="stat-bar-container">
+                        <div id="cleanBar" class="stat-bar" style="width: 100%"></div>
+                    </div>
+                    <span id="cleanValue" class="stat-value">100</span>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-header">
+                        <span class="stat-icon">❤️</span>
+                        <span class="stat-label">행복도</span>
+                    </div>
+                    <div class="stat-bar-container">
+                        <div id="happyBar" class="stat-bar" style="width: 100%"></div>
+                    </div>
+                    <span id="happyValue" class="stat-value">100</span>
+                </div>
+
+                <div class="stat-item">
+                    <div class="stat-header">
+                        <span class="stat-icon">⚡</span>
+                        <span class="stat-label">에너지</span>
+                    </div>
+                    <div class="stat-bar-container">
+                        <div id="energyBar" class="stat-bar" style="width: 100%"></div>
+                    </div>
+                    <span id="energyValue" class="stat-value">100</span>
+                </div>
+            </div>
+
+            <!-- 액션 버튼 영역 -->
+            <div class="actions-area">
+                <button id="feedBtn" class="action-btn feed">
+                    <span class="btn-icon">🍖</span>
+                    <span class="btn-text">먹이기</span>
+                </button>
+                <button id="walkBtn" class="action-btn walk">
+                    <span class="btn-icon">🚶</span>
+                    <span class="btn-text">산책하기</span>
+                </button>
+                <button id="bathBtn" class="action-btn bath">
+                    <span class="btn-icon">🛁</span>
+                    <span class="btn-text">씻기기</span>
+                </button>
+                <button id="playBtn" class="action-btn play">
+                    <span class="btn-icon">🎾</span>
+                    <span class="btn-text">놀아주기</span>
+                </button>
+                <button id="sleepBtn" class="action-btn sleep">
+                    <span class="btn-icon">😴</span>
+                    <span class="btn-text">재우기</span>
+                </button>
+            </div>
+        </div>
+
+        <footer>
+            <div class="time-display">
+                <span>게임 시간: </span>
+                <span id="gameTime">0일 0시간 0분</span>
+            </div>
+            <button id="resetBtn" class="reset-btn">게임 초기화</button>
+        </footer>
+    </div>
+
+    <script src="game.js"></script>
 </body>
 </html>
