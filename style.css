@@ -258,6 +258,103 @@ header h1 {
     50% { transform: scale(1.05); }
 }
 
+/* 똥 컨테이너 */
+.poop-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.poop {
+    position: absolute;
+    font-size: 2em;
+    cursor: pointer;
+    pointer-events: auto;
+    animation: poopAppear 0.5s ease-out;
+    transition: transform 0.2s;
+}
+
+.poop:hover {
+    transform: scale(1.2);
+}
+
+@keyframes poopAppear {
+    0% {
+        transform: scale(0) translateY(-20px);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes poopDisappear {
+    0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0) rotate(180deg);
+        opacity: 0;
+    }
+}
+
+/* 강아지 랜덤 애니메이션 */
+.pet-character.idle-wiggle {
+    animation: idleWiggle 1s ease-in-out;
+}
+
+@keyframes idleWiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+    75% { transform: rotate(-3deg); }
+}
+
+.pet-character.idle-bounce {
+    animation: idleBounce 0.8s ease-in-out;
+}
+
+@keyframes idleBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.pet-character.idle-shake {
+    animation: idleShake 0.6s ease-in-out;
+}
+
+@keyframes idleShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+    75% { transform: translateX(-5px); }
+}
+
+/* 클릭 반응 */
+.pet-character.clicked {
+    animation: clickReaction 0.5s ease-out;
+}
+
+@keyframes clickReaction {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15) rotate(5deg); }
+    100% { transform: scale(1); }
+}
+
+.dog-image.happy-wiggle {
+    animation: happyWiggle 0.5s ease-in-out;
+}
+
+@keyframes happyWiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+    75% { transform: rotate(-5deg); }
+}
+
 /* 강아지 얼굴 */
 .dog-face {
     position: relative;

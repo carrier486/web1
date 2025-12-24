@@ -15,6 +15,10 @@ class PetGame {
         this.cash = 20000; // 기본 캐시
         this.food = 0; // 먹이 개수
 
+        // 똥 시스템
+        this.poops = []; // 똥 배열
+        this.lastPoopTime = Date.now();
+
         // 실제 강아지 이미지 목록 (Unsplash에서 무료 강아지 이미지)
         this.dogImages = [
             'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop',
@@ -52,11 +56,17 @@ class PetGame {
         this.cashDisplay = document.getElementById('cashDisplay');
         this.foodDisplay = document.getElementById('foodDisplay');
 
+        // 똥 컨테이너
+        this.poopContainer = document.getElementById('poopContainer');
+
         // 강아지 이미지 랜덤 설정 (저장된 이미지가 없으면)
         if (!this.selectedDogImage) {
             this.selectedDogImage = this.dogImages[Math.floor(Math.random() * this.dogImages.length)];
         }
         this.dogImage.src = this.selectedDogImage;
+
+        // 강아지 클릭 이벤트
+        this.dogImage.addEventListener('click', () => this.onDogClick());
 
         // 버튼 이벤트 리스너
         document.getElementById('feedBtn').addEventListener('click', () => this.feed());
@@ -70,6 +80,12 @@ class PetGame {
 
         this.updateDisplay();
         this.petNameDisplay.textContent = this.petName;
+
+        // 랜덤 애니메이션 시작
+        this.startRandomAnimations();
+
+        // 똥 시스템 시작
+        this.startPoopSystem();
     }
 
     // 게임 루프 - 시간에 따라 상태 감소
@@ -383,6 +399,118 @@ class PetGame {
         }
     }
 
+    // 강아지 클릭 반응
+    onDogClick() {
+        const reactions = [
+            { message: '멍멍! 🐶', emoji: '🥰' },
+            { message: '좋아요! ❤️', emoji: '😍' },
+            { message: '만져주세요! 👋', emoji: '😊' },
+            { message: '놀아줘요! 🎾', emoji: '🤩' },
+            { message: '행복해요! ✨', emoji: '😄' }
+        ];
+
+        const reaction = reactions[Math.floor(Math.random() * reactions.length)];
+
+        // 클릭 애니메이션
+        this.petCharacter.classList.add('clicked');
+        this.dogImage.classList.add('happy-wiggle');
+
+        setTimeout(() => {
+            this.petCharacter.classList.remove('clicked');
+            this.dogImage.classList.remove('happy-wiggle');
+        }, 500);
+
+        // 메시지와 이모지 표시
+        this.showMessage(reaction.message);
+        this.statusEmoji.textContent = reaction.emoji;
+
+        setTimeout(() => {
+            this.updateStatusEmoji();
+        }, 2000);
+
+        // 행복도 약간 증가
+        this.stats.happy = Math.min(100, this.stats.happy + 2);
+        this.updateDisplay();
+        this.saveGame();
+    }
+
+    // 랜덤 애니메이션 시작
+    startRandomAnimations() {
+        setInterval(() => {
+            // 랜덤하게 재롱부리기 (30% 확률)
+            if (Math.random() < 0.3) {
+                this.playIdleAnimation();
+            }
+        }, 5000); // 5초마다 체크
+    }
+
+    // 랜덤 재롱 애니메이션
+    playIdleAnimation() {
+        const animations = ['idle-wiggle', 'idle-bounce', 'idle-shake'];
+        const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+
+        this.petCharacter.classList.add(randomAnim);
+
+        setTimeout(() => {
+            this.petCharacter.classList.remove(randomAnim);
+        }, 1000);
+    }
+
+    // 똥 시스템 시작
+    startPoopSystem() {
+        setInterval(() => {
+            // 청결도가 50 이하이고, 마지막 똥 이후 30초 경과 시 똥 싸기
+            const now = Date.now();
+            const timeSinceLastPoop = (now - this.lastPoopTime) / 1000;
+
+            if (this.stats.clean < 50 && timeSinceLastPoop > 30 && this.poops.length < 3) {
+                this.createPoop();
+                this.lastPoopTime = now;
+            }
+        }, 10000); // 10초마다 체크
+    }
+
+    // 똥 생성
+    createPoop() {
+        const poop = document.createElement('div');
+        poop.className = 'poop';
+        poop.textContent = '💩';
+        poop.style.left = `${Math.random() * 70 + 10}%`;
+        poop.style.top = `${Math.random() * 60 + 20}%`;
+
+        poop.addEventListener('click', () => this.cleanPoop(poop));
+
+        this.poopContainer.appendChild(poop);
+        this.poops.push(poop);
+
+        // 청결도 감소
+        this.stats.clean = Math.max(0, this.stats.clean - 10);
+        this.updateDisplay();
+        this.saveGame();
+
+        this.showMessage('앗! 실수했어요... 😅');
+    }
+
+    // 똥 청소
+    cleanPoop(poop) {
+        poop.style.animation = 'poopDisappear 0.3s ease-out';
+
+        setTimeout(() => {
+            poop.remove();
+            const index = this.poops.indexOf(poop);
+            if (index > -1) {
+                this.poops.splice(index, 1);
+            }
+        }, 300);
+
+        // 청결도 회복
+        this.stats.clean = Math.min(100, this.stats.clean + 5);
+        this.updateDisplay();
+        this.saveGame();
+
+        this.showToast('깨끗하게 치웠어요! ✨', 'success');
+    }
+
     // 게임 초기화
     resetGame() {
         if (confirm('정말 게임을 초기화하시겠습니까? 모든 진행 상황이 삭제됩니다.')) {
@@ -398,6 +526,11 @@ class PetGame {
             this.lastUpdateTime = Date.now();
             this.cash = 20000;
             this.food = 0;
+            this.lastPoopTime = Date.now();
+
+            // 모든 똥 제거
+            this.poops.forEach(poop => poop.remove());
+            this.poops = [];
 
             // 새로운 강아지 이미지 랜덤 선택
             this.selectedDogImage = this.dogImages[Math.floor(Math.random() * this.dogImages.length)];
