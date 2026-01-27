@@ -168,8 +168,8 @@
         let animationId;
         let dotsRemaining = 0;
         let frameCount = 0;
-        const PACMAN_MOVE_INTERVAL = 3;  // 팩맨: 3프레임마다 이동 (속도 1/3)
-        const GHOST_MOVE_INTERVAL = 15;  // 유령: 15프레임마다 이동 (속도 1/15)
+        const PACMAN_MOVE_INTERVAL = 3;   // 팩맨: 3프레임마다 이동 (속도 1/3)
+        const GHOST_MOVE_INTERVAL = 150; // 유령: 150프레임마다 이동 (기존의 1/10 속도)
 
         // Map: 0=empty, 1=wall, 2=dot, 3=power pellet, 4=ghost house
         const originalMap = [
