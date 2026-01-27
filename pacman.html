@@ -167,6 +167,8 @@
         let gamePaused = false;
         let animationId;
         let dotsRemaining = 0;
+        let frameCount = 0;
+        const MOVE_INTERVAL = 3; // 3프레임마다 이동 (속도 1/3)
 
         // Map: 0=empty, 1=wall, 2=dot, 3=power pellet, 4=ghost house
         const originalMap = [
@@ -261,6 +263,7 @@
 
             powerMode = false;
             powerTimer = 0;
+            frameCount = 0;
 
             updateDisplay();
         }
@@ -299,59 +302,68 @@
                 pacman.mouthDir *= -1;
             }
 
-            // Try next direction
-            let nextX = pacman.x + pacman.nextDx;
-            let nextY = pacman.y + pacman.nextDy;
+            // 프레임 카운터 증가
+            frameCount++;
 
-            // Tunnel wrap
-            if (nextX < 0) nextX = COLS - 1;
-            if (nextX >= COLS) nextX = 0;
+            // 3프레임마다 한 번씩만 이동 (속도 1/3)
+            if (frameCount % MOVE_INTERVAL === 0) {
+                // Try next direction
+                let nextX = pacman.x + pacman.nextDx;
+                let nextY = pacman.y + pacman.nextDy;
 
-            if (canMove(nextX, nextY)) {
-                pacman.dx = pacman.nextDx;
-                pacman.dy = pacman.nextDy;
+                // Tunnel wrap
+                if (nextX < 0) nextX = COLS - 1;
+                if (nextX >= COLS) nextX = 0;
+
+                if (canMove(nextX, nextY)) {
+                    pacman.dx = pacman.nextDx;
+                    pacman.dy = pacman.nextDy;
+                }
+
+                // Move pacman
+                let newX = pacman.x + pacman.dx;
+                let newY = pacman.y + pacman.dy;
+
+                // Tunnel wrap
+                if (newX < 0) newX = COLS - 1;
+                if (newX >= COLS) newX = 0;
+
+                if (canMove(newX, newY)) {
+                    pacman.x = newX;
+                    pacman.y = newY;
+
+                    // Eat dots
+                    if (map[pacman.y][pacman.x] === 2) {
+                        map[pacman.y][pacman.x] = 0;
+                        score += 10;
+                        dotsRemaining--;
+                        updateDisplay();
+                    }
+                    // Eat power pellet
+                    else if (map[pacman.y][pacman.x] === 3) {
+                        map[pacman.y][pacman.x] = 0;
+                        score += 50;
+                        dotsRemaining--;
+                        powerMode = true;
+                        powerTimer = 300; // About 5 seconds
+                        ghosts.forEach(g => {
+                            if (!g.eaten) g.scared = true;
+                        });
+                        updateDisplay();
+                    }
+
+                    // Check win
+                    if (dotsRemaining === 0) {
+                        gameWin();
+                        return;
+                    }
+                }
+
+                // Update ghosts
+                updateGhosts();
             }
 
-            // Move pacman
-            let newX = pacman.x + pacman.dx;
-            let newY = pacman.y + pacman.dy;
-
-            // Tunnel wrap
-            if (newX < 0) newX = COLS - 1;
-            if (newX >= COLS) newX = 0;
-
-            if (canMove(newX, newY)) {
-                pacman.x = newX;
-                pacman.y = newY;
-
-                // Eat dots
-                if (map[pacman.y][pacman.x] === 2) {
-                    map[pacman.y][pacman.x] = 0;
-                    score += 10;
-                    dotsRemaining--;
-                    updateDisplay();
-                }
-                // Eat power pellet
-                else if (map[pacman.y][pacman.x] === 3) {
-                    map[pacman.y][pacman.x] = 0;
-                    score += 50;
-                    dotsRemaining--;
-                    powerMode = true;
-                    powerTimer = 300; // About 5 seconds
-                    ghosts.forEach(g => {
-                        if (!g.eaten) g.scared = true;
-                    });
-                    updateDisplay();
-                }
-
-                // Check win
-                if (dotsRemaining === 0) {
-                    gameWin();
-                    return;
-                }
-            }
-
-            // Update power mode
+            // Update power mode (매 프레임)
             if (powerMode) {
                 powerTimer--;
                 if (powerTimer <= 0) {
@@ -360,10 +372,7 @@
                 }
             }
 
-            // Update ghosts
-            updateGhosts();
-
-            // Check collision with ghosts
+            // Check collision with ghosts (매 프레임 체크)
             checkGhostCollision();
         }
 
