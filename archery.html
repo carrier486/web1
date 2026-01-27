@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏹 양궁 대결 - Archery PvP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 1000px;
+            height: 700px;
+            background: #000;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        #gameCanvas {
+            display: block;
+            cursor: crosshair;
+        }
+
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .player-panel {
+            background: rgba(0,0,0,0.7);
+            padding: 15px 20px;
+            border-radius: 10px;
+            min-width: 180px;
+            backdrop-filter: blur(5px);
+        }
+
+        .player-panel.active {
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .player-panel h3 {
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .player-panel.p1 h3 { color: #ff6b6b; }
+        .player-panel.p2 h3 { color: #4ecdc4; }
+
+        .score-display {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .arrows-display {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .arrow-scores {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .arrow-score {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            background: #333;
+            color: #666;
+        }
+
+        .arrow-score.hit {
+            background: #ffd700;
+            color: #000;
+        }
+
+        .arrow-score.ten {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        #roundInfo {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            padding: 10px 25px;
+            border-radius: 20px;
+            color: #fff;
+            font-size: 16px;
+            z-index: 10;
+        }
+
+        #instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #startScreen, #resultScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        #startScreen h1, #resultScreen h1 {
+            font-size: 48px;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        #startScreen p {
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 16px;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            border: none;
+            border-radius: 30px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            pointer-events: auto;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        #resultScreen .winner {
+            font-size: 72px;
+            margin-bottom: 10px;
+        }
+
+        #resultScreen .winner-text {
+            font-size: 32px;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+
+        .final-scores {
+            display: flex;
+            gap: 50px;
+            margin-bottom: 30px;
+        }
+
+        .final-score-panel {
+            text-align: center;
+            padding: 20px 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+
+        .final-score-panel h3 {
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .final-score-panel .score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .round-results {
+            color: #aaa;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        #closeupOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+
+        #closeupCanvas {
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+        }
+
+        #closeupScore {
+            position: absolute;
+            bottom: 100px;
+            font-size: 64px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="1000" height="700"></canvas>
+
+        <div id="ui">
+            <div class="player-panel p1" id="p1Panel">
+                <h3>🏹 Player 1</h3>
+                <div class="score-display" id="p1Score">0</div>
+                <div class="arrows-display">화살: <span id="p1Arrows">3</span>/3</div>
+                <div class="arrow-scores" id="p1ArrowScores">
+                    <div class="arrow-score">-</div>
+                    <div class="arrow-score">-</div>
+                    <div class="arrow-score">-</div>
+                </div>
+            </div>
+
+            <div class="player-panel p2" id="p2Panel">
+                <h3>🏹 Player 2</h3>
+                <div class="score-display" id="p2Score">0</div>
+                <div class="arrows-display">화살: <span id="p2Arrows">3</span>/3</div>
+                <div class="arrow-scores" id="p2ArrowScores">
+                    <div class="arrow-score">-</div>
+                    <div class="arrow-score">-</div>
+                    <div class="arrow-score">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="roundInfo">라운드 1 / 3</div>
+
+        <div id="instructions">클릭하고 드래그하여 조준 → 놓으면 발사!</div>
+
+        <div id="closeupOverlay">
+            <canvas id="closeupCanvas" width="300" height="300"></canvas>
+            <div id="closeupScore">10</div>
+        </div>
+
+        <div id="startScreen">
+            <h1>🏹 양궁 대결</h1>
+            <p>
+                1대1 양궁 대결 게임<br>
+                각 라운드 3발씩 발사하여 점수 합산<br>
+                3라운드 진행 후 총점으로 승부!<br><br>
+                마우스 클릭 → 드래그로 조준 → 놓으면 발사
+            </p>
+            <button class="btn" id="startBtn">게임 시작</button>
+        </div>
+
+        <div id="resultScreen" style="display: none;">
+            <div class="winner" id="winnerEmoji">🏆</div>
+            <h1 id="winnerText">Player 1 승리!</h1>
+            <div class="final-scores">
+                <div class="final-score-panel">
+                    <h3>Player 1</h3>
+                    <div class="score" id="finalP1">0</div>
+                </div>
+                <div class="final-score-panel">
+                    <h3>Player 2</h3>
+                    <div class="score" id="finalP2">0</div>
+                </div>
+            </div>
+            <div class="round-results" id="roundResults"></div>
+            <button class="btn" id="restartBtn">다시 하기</button>
+        </div>
+    </div>
+
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const closeupCanvas = document.getElementById('closeupCanvas');
+        const closeupCtx = closeupCanvas.getContext('2d');
+
+        // Game state
+        let gameState = 'start'; // start, playing, aiming, shooting, closeup, result
+        let currentPlayer = 1;
+        let currentRound = 1;
+        const maxRounds = 3;
+        const arrowsPerRound = 3;
+
+        let players = {
+            1: { score: 0, roundScores: [], currentArrows: [], arrowsLeft: 3, wins: 0 },
+            2: { score: 0, roundScores: [], currentArrows: [], arrowsLeft: 3, wins: 0 }
+        };
+
+        // Aiming state
+        let isAiming = false;
+        let aimStartTime = 0;
+        let aimX = 500;
+        let aimY = 300;
+        let drawStrength = 0;
+        let maxDrawStrength = 100;
+        let mouseX = 500;
+        let mouseY = 300;
+
+        // Arrow state
+        let arrow = null;
+        let arrowsOnTarget = [];
+
+        // Target settings (3D perspective)
+        const target = {
+            x: 500,
+            y: 280,
+            baseRadius: 120,
+            distance: 70, // meters
+            rings: [
+                { radius: 1.0, color: '#fff', score: 1 },
+                { radius: 0.9, color: '#fff', score: 2 },
+                { radius: 0.8, color: '#000', score: 3 },
+                { radius: 0.7, color: '#000', score: 4 },
+                { radius: 0.6, color: '#4a9eff', score: 5 },
+                { radius: 0.5, color: '#4a9eff', score: 6 },
+                { radius: 0.4, color: '#ff4444', score: 7 },
+                { radius: 0.3, color: '#ff4444', score: 8 },
+                { radius: 0.2, color: '#ffd700', score: 9 },
+                { radius: 0.1, color: '#ffd700', score: 10 }
+            ]
+        };
+
+        // Wind
+        let wind = { x: 0, y: 0 };
+
+        // Bow state
+        let bowAngle = 0;
+
+        // Sway (hand tremor)
+        let swayTime = 0;
+        let swayX = 0;
+        let swayY = 0;
+
+        // Initialize
+        function init() {
+            resetRound();
+            updateUI();
+            gameLoop();
+        }
+
+        function resetGame() {
+            currentPlayer = 1;
+            currentRound = 1;
+            players = {
+                1: { score: 0, roundScores: [], currentArrows: [], arrowsLeft: 3, wins: 0 },
+                2: { score: 0, roundScores: [], currentArrows: [], arrowsLeft: 3, wins: 0 }
+            };
+            arrowsOnTarget = [];
+            resetRound();
+            updateUI();
+        }
+
+        function resetRound() {
+            players[1].arrowsLeft = arrowsPerRound;
+            players[2].arrowsLeft = arrowsPerRound;
+            players[1].currentArrows = [];
+            players[2].currentArrows = [];
+            arrowsOnTarget = [];
+            generateWind();
+        }
+
+        function generateWind() {
+            wind.x = (Math.random() - 0.5) * 4;
+            wind.y = (Math.random() - 0.5) * 2;
+        }
+
+        // Drawing functions
+        function drawBackground() {
+            // Sky gradient
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, 400);
+            skyGradient.addColorStop(0, '#87CEEB');
+            skyGradient.addColorStop(1, '#E0F6FF');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, 1000, 400);
+
+            // Ground
+            const groundGradient = ctx.createLinearGradient(0, 400, 0, 700);
+            groundGradient.addColorStop(0, '#4a7c23');
+            groundGradient.addColorStop(1, '#2d5016');
+            ctx.fillStyle = groundGradient;
+            ctx.fillRect(0, 400, 1000, 300);
+
+            // Lane lines (perspective)
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 2;
+            for (let i = -2; i <= 2; i++) {
+                ctx.beginPath();
+                ctx.moveTo(500 + i * 200, 700);
+                ctx.lineTo(500 + i * 20, 400);
+                ctx.stroke();
+            }
+
+            // Distance markers
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('70m', 500, 390);
+        }
+
+        function drawTarget() {
+            const { x, y, baseRadius, rings } = target;
+
+            // Target stand
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(x - 5, y + baseRadius, 10, 80);
+            ctx.fillRect(x - 40, y + baseRadius + 70, 80, 10);
+
+            // Draw rings (outer to inner)
+            for (let i = 0; i < rings.length; i++) {
+                const ring = rings[i];
+                const radius = baseRadius * ring.radius;
+
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = ring.color;
+                ctx.fill();
+                ctx.strokeStyle = i < 2 ? '#ccc' : (ring.color === '#000' ? '#333' : '#000');
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            // X mark in center
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(x - 5, y - 5);
+            ctx.lineTo(x + 5, y + 5);
+            ctx.moveTo(x + 5, y - 5);
+            ctx.lineTo(x - 5, y + 5);
+            ctx.stroke();
+
+            // Draw arrows on target
+            arrowsOnTarget.forEach(arr => {
+                drawArrowOnTarget(arr.x, arr.y, arr.player);
+            });
+        }
+
+        function drawArrowOnTarget(ax, ay, player) {
+            const color = player === 1 ? '#ff6b6b' : '#4ecdc4';
+
+            // Arrow shaft
+            ctx.beginPath();
+            ctx.arc(ax, ay, 4, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Fletching
+            ctx.beginPath();
+            ctx.moveTo(ax, ay);
+            ctx.lineTo(ax - 8, ay - 5);
+            ctx.lineTo(ax - 8, ay + 5);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function drawBow() {
+            const bowX = 500;
+            const bowY = 580;
+            const bowWidth = 200;
+            const bowHeight = 300;
+
+            // Calculate aim offset from center
+            const aimOffsetX = (mouseX - 500) * 0.1;
+            const aimOffsetY = (mouseY - 350) * 0.1;
+
+            ctx.save();
+            ctx.translate(bowX + aimOffsetX, bowY + aimOffsetY);
+
+            // Bow limbs
+            const drawPull = isAiming ? Math.min(drawStrength / maxDrawStrength, 1) : 0;
+
+            // Left limb
+            ctx.beginPath();
+            ctx.moveTo(-20, -100);
+            ctx.quadraticCurveTo(-80 + drawPull * 20, -50, -70 + drawPull * 15, 50);
+            ctx.quadraticCurveTo(-75 + drawPull * 18, 100, -30, 140);
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 12;
+            ctx.stroke();
+            ctx.strokeStyle = '#A0522D';
+            ctx.lineWidth = 8;
+            ctx.stroke();
+
+            // Right limb
+            ctx.beginPath();
+            ctx.moveTo(20, -100);
+            ctx.quadraticCurveTo(80 - drawPull * 20, -50, 70 - drawPull * 15, 50);
+            ctx.quadraticCurveTo(75 - drawPull * 18, 100, 30, 140);
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 12;
+            ctx.stroke();
+            ctx.strokeStyle = '#A0522D';
+            ctx.lineWidth = 8;
+            ctx.stroke();
+
+            // Grip
+            ctx.fillStyle = '#654321';
+            ctx.fillRect(-15, -20, 30, 80);
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(-12, -15, 24, 70);
+
+            // Bowstring
+            const stringPull = drawPull * 60;
+            ctx.beginPath();
+            ctx.moveTo(-20, -95);
+            ctx.lineTo(0, 20 + stringPull);
+            ctx.lineTo(20, -95);
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Arrow on bow (when aiming)
+            if (isAiming && drawStrength > 10) {
+                const arrowLength = 150;
+                const arrowY = 20 + stringPull;
+
+                // Shaft
+                ctx.beginPath();
+                ctx.moveTo(0, arrowY);
+                ctx.lineTo(0, arrowY - arrowLength);
+                ctx.strokeStyle = '#8B4513';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+
+                // Arrowhead
+                ctx.beginPath();
+                ctx.moveTo(0, arrowY - arrowLength - 15);
+                ctx.lineTo(-6, arrowY - arrowLength);
+                ctx.lineTo(6, arrowY - arrowLength);
+                ctx.closePath();
+                ctx.fillStyle = '#666';
+                ctx.fill();
+
+                // Fletching
+                ctx.beginPath();
+                ctx.moveTo(-8, arrowY - 10);
+                ctx.lineTo(0, arrowY - 25);
+                ctx.lineTo(8, arrowY - 10);
+                ctx.strokeStyle = '#ff4444';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            ctx.restore();
+
+            // Draw power meter when aiming
+            if (isAiming) {
+                const meterX = 50;
+                const meterY = 300;
+                const meterHeight = 200;
+                const meterWidth = 20;
+
+                // Background
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.fillRect(meterX - 5, meterY - 5, meterWidth + 10, meterHeight + 10);
+
+                // Meter background
+                ctx.fillStyle = '#333';
+                ctx.fillRect(meterX, meterY, meterWidth, meterHeight);
+
+                // Power level
+                const powerHeight = (drawStrength / maxDrawStrength) * meterHeight;
+                const powerGradient = ctx.createLinearGradient(0, meterY + meterHeight, 0, meterY);
+                powerGradient.addColorStop(0, '#00ff00');
+                powerGradient.addColorStop(0.5, '#ffff00');
+                powerGradient.addColorStop(1, '#ff0000');
+                ctx.fillStyle = powerGradient;
+                ctx.fillRect(meterX, meterY + meterHeight - powerHeight, meterWidth, powerHeight);
+
+                // Optimal zone
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(meterX - 2, meterY + meterHeight * 0.2, meterWidth + 4, meterHeight * 0.2);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('POWER', meterX + meterWidth / 2, meterY - 10);
+            }
+        }
+
+        function drawCrosshair() {
+            if (!isAiming) return;
+
+            // Apply sway
+            swayTime += 0.05;
+            const swayAmount = Math.max(5, 20 - drawStrength * 0.15);
+            swayX = Math.sin(swayTime * 2.3) * swayAmount + Math.sin(swayTime * 1.7) * swayAmount * 0.5;
+            swayY = Math.cos(swayTime * 1.9) * swayAmount + Math.cos(swayTime * 2.7) * swayAmount * 0.5;
+
+            const cx = mouseX + swayX;
+            const cy = mouseY + swayY;
+
+            // Outer circle
+            ctx.beginPath();
+            ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Cross lines
+            ctx.beginPath();
+            ctx.moveTo(cx - 40, cy);
+            ctx.lineTo(cx - 10, cy);
+            ctx.moveTo(cx + 10, cy);
+            ctx.lineTo(cx + 40, cy);
+            ctx.moveTo(cx, cy - 40);
+            ctx.lineTo(cx, cy - 10);
+            ctx.moveTo(cx, cy + 10);
+            ctx.lineTo(cx, cy + 40);
+            ctx.stroke();
+
+            // Center dot
+            ctx.beginPath();
+            ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.9)';
+            ctx.fill();
+
+            // Store actual aim position
+            aimX = cx;
+            aimY = cy;
+        }
+
+        function drawWindIndicator() {
+            const wx = 900;
+            const wy = 150;
+
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(wx - 40, wy - 40, 80, 80);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('WIND', wx, wy - 25);
+
+            // Wind direction arrow
+            const windMagnitude = Math.sqrt(wind.x * wind.x + wind.y * wind.y);
+            const windAngle = Math.atan2(wind.y, wind.x);
+
+            ctx.save();
+            ctx.translate(wx, wy);
+            ctx.rotate(windAngle);
+
+            const arrowLen = windMagnitude * 10;
+            ctx.beginPath();
+            ctx.moveTo(-arrowLen, 0);
+            ctx.lineTo(arrowLen, 0);
+            ctx.lineTo(arrowLen - 8, -5);
+            ctx.moveTo(arrowLen, 0);
+            ctx.lineTo(arrowLen - 8, 5);
+            ctx.strokeStyle = '#4a9eff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.restore();
+
+            ctx.fillStyle = '#aaa';
+            ctx.font = '10px Arial';
+            ctx.fillText(`${windMagnitude.toFixed(1)} m/s`, wx, wy + 30);
+        }
+
+        function drawFlyingArrow() {
+            if (!arrow) return;
+
+            const { x, y, z, player } = arrow;
+
+            // 3D to 2D projection
+            const scale = 1000 / (1000 + z);
+            const screenX = 500 + (x - 500) * scale;
+            const screenY = 350 + (y - 350) * scale;
+            const arrowSize = 20 * scale;
+
+            const color = player === 1 ? '#ff6b6b' : '#4ecdc4';
+
+            // Arrow shadow on ground
+            if (y < 400) {
+                ctx.beginPath();
+                ctx.ellipse(screenX, 400 + z * 0.1, arrowSize * 0.5, arrowSize * 0.2, 0, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fill();
+            }
+
+            // Arrow
+            ctx.save();
+            ctx.translate(screenX, screenY);
+
+            // Shaft
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, arrowSize);
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = Math.max(2, 4 * scale);
+            ctx.stroke();
+
+            // Arrowhead
+            ctx.beginPath();
+            ctx.moveTo(0, -arrowSize * 0.3);
+            ctx.lineTo(-arrowSize * 0.2, arrowSize * 0.1);
+            ctx.lineTo(arrowSize * 0.2, arrowSize * 0.1);
+            ctx.closePath();
+            ctx.fillStyle = '#666';
+            ctx.fill();
+
+            // Fletching
+            ctx.beginPath();
+            ctx.moveTo(-arrowSize * 0.3, arrowSize * 0.8);
+            ctx.lineTo(0, arrowSize * 0.5);
+            ctx.lineTo(arrowSize * 0.3, arrowSize * 0.8);
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawPlayerIndicator() {
+            const playerColor = currentPlayer === 1 ? '#ff6b6b' : '#4ecdc4';
+            const playerName = `Player ${currentPlayer}`;
+
+            ctx.fillStyle = playerColor;
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${playerName}의 차례`, 500, 650);
+        }
+
+        // Game logic
+        function shootArrow() {
+            const power = Math.min(drawStrength / maxDrawStrength, 1);
+
+            // Calculate target position with wind and aim
+            const targetX = aimX + wind.x * 10 * (1 - power * 0.3);
+            const targetY = aimY + wind.y * 10 * (1 - power * 0.3);
+
+            // Power affects accuracy
+            const powerAccuracy = power > 0.6 && power < 0.8 ? 1 : 0.7;
+            const randomSpread = (1 - powerAccuracy) * 30;
+
+            const finalX = targetX + (Math.random() - 0.5) * randomSpread;
+            const finalY = targetY + (Math.random() - 0.5) * randomSpread;
+
+            arrow = {
+                x: 500,
+                y: 550,
+                z: 0,
+                targetX: finalX,
+                targetY: finalY,
+                targetZ: 800,
+                progress: 0,
+                player: currentPlayer
+            };
+
+            gameState = 'shooting';
+            isAiming = false;
+            drawStrength = 0;
+        }
+
+        function updateArrow() {
+            if (!arrow) return;
+
+            arrow.progress += 0.025;
+
+            if (arrow.progress >= 1) {
+                // Arrow hit
+                const hitX = arrow.targetX;
+                const hitY = arrow.targetY;
+
+                // Calculate score
+                const dx = hitX - target.x;
+                const dy = hitY - target.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                let score = 0;
+                for (let i = target.rings.length - 1; i >= 0; i--) {
+                    if (distance <= target.baseRadius * target.rings[i].radius) {
+                        score = target.rings[i].score;
+                        break;
+                    }
+                }
+
+                // Add arrow to target
+                arrowsOnTarget.push({
+                    x: hitX,
+                    y: hitY,
+                    player: currentPlayer,
+                    score: score
+                });
+
+                // Update player score
+                players[currentPlayer].score += score;
+                players[currentPlayer].currentArrows.push(score);
+                players[currentPlayer].arrowsLeft--;
+
+                arrow = null;
+
+                // Show closeup
+                showCloseup(hitX, hitY, score);
+            } else {
+                // Animate arrow flight
+                const t = arrow.progress;
+                const easeT = 1 - Math.pow(1 - t, 3);
+
+                arrow.x = 500 + (arrow.targetX - 500) * easeT;
+                arrow.y = 550 + (arrow.targetY - 550) * easeT - Math.sin(t * Math.PI) * 100;
+                arrow.z = arrow.targetZ * easeT;
+            }
+        }
+
+        function showCloseup(hitX, hitY, score) {
+            gameState = 'closeup';
+
+            const overlay = document.getElementById('closeupOverlay');
+            const scoreDisplay = document.getElementById('closeupScore');
+
+            overlay.style.display = 'flex';
+            scoreDisplay.textContent = score > 0 ? `${score}점!` : 'MISS!';
+            scoreDisplay.style.color = score === 10 ? '#ff4444' : (score > 0 ? '#ffd700' : '#ff0000');
+
+            // Draw closeup
+            drawCloseupTarget(hitX, hitY);
+
+            // Hide after delay
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                updateUI();
+                nextTurn();
+            }, 1500);
+        }
+
+        function drawCloseupTarget(hitX, hitY) {
+            const ctx = closeupCtx;
+            const size = 300;
+            const centerX = size / 2;
+            const centerY = size / 2;
+
+            // Clear
+            ctx.clearRect(0, 0, size, size);
+
+            // Scale to show area around hit
+            const scale = 2;
+            const offsetX = (hitX - target.x) * scale;
+            const offsetY = (hitY - target.y) * scale;
+
+            // Draw rings
+            target.rings.forEach((ring, i) => {
+                const radius = target.baseRadius * ring.radius * scale;
+                ctx.beginPath();
+                ctx.arc(centerX - offsetX, centerY - offsetY, radius, 0, Math.PI * 2);
+                ctx.fillStyle = ring.color;
+                ctx.fill();
+                ctx.strokeStyle = i < 2 ? '#ccc' : (ring.color === '#000' ? '#333' : '#000');
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+
+            // Draw arrow hit point
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
+            ctx.fillStyle = currentPlayer === 1 ? '#ff6b6b' : '#4ecdc4';
+            ctx.fill();
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Arrow shaft
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX - 20, centerY + 20);
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+        }
+
+        function nextTurn() {
+            // Check if round is complete
+            if (players[1].arrowsLeft === 0 && players[2].arrowsLeft === 0) {
+                endRound();
+            } else if (players[currentPlayer].arrowsLeft === 0) {
+                // Switch to other player
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+                gameState = 'playing';
+            } else {
+                // Same player continues or switch
+                if (currentPlayer === 1 && players[2].arrowsLeft > 0) {
+                    currentPlayer = 2;
+                } else if (currentPlayer === 2 && players[1].arrowsLeft > 0) {
+                    currentPlayer = 1;
+                }
+                gameState = 'playing';
+            }
+            updateUI();
+        }
+
+        function endRound() {
+            // Calculate round winner
+            const p1RoundScore = players[1].currentArrows.reduce((a, b) => a + b, 0);
+            const p2RoundScore = players[2].currentArrows.reduce((a, b) => a + b, 0);
+
+            players[1].roundScores.push(p1RoundScore);
+            players[2].roundScores.push(p2RoundScore);
+
+            if (p1RoundScore > p2RoundScore) {
+                players[1].wins++;
+            } else if (p2RoundScore > p1RoundScore) {
+                players[2].wins++;
+            }
+
+            if (currentRound >= maxRounds) {
+                endGame();
+            } else {
+                currentRound++;
+                resetRound();
+                currentPlayer = 1;
+                gameState = 'playing';
+                updateUI();
+            }
+        }
+
+        function endGame() {
+            gameState = 'result';
+
+            const resultScreen = document.getElementById('resultScreen');
+            resultScreen.style.display = 'flex';
+
+            document.getElementById('finalP1').textContent = players[1].score;
+            document.getElementById('finalP2').textContent = players[2].score;
+
+            let winnerText, winnerEmoji;
+            if (players[1].score > players[2].score) {
+                winnerText = 'Player 1 승리!';
+                winnerEmoji = '🔴';
+            } else if (players[2].score > players[1].score) {
+                winnerText = 'Player 2 승리!';
+                winnerEmoji = '🔵';
+            } else {
+                winnerText = '무승부!';
+                winnerEmoji = '🤝';
+            }
+
+            document.getElementById('winnerText').textContent = winnerText;
+            document.getElementById('winnerEmoji').textContent = winnerEmoji;
+
+            // Round details
+            let roundDetails = '';
+            for (let i = 0; i < maxRounds; i++) {
+                const p1 = players[1].roundScores[i] || 0;
+                const p2 = players[2].roundScores[i] || 0;
+                const winner = p1 > p2 ? 'P1' : (p2 > p1 ? 'P2' : 'Draw');
+                roundDetails += `Round ${i + 1}: P1(${p1}) vs P2(${p2}) - ${winner} | `;
+            }
+            document.getElementById('roundResults').textContent = roundDetails;
+        }
+
+        function updateUI() {
+            document.getElementById('p1Score').textContent = players[1].score;
+            document.getElementById('p2Score').textContent = players[2].score;
+            document.getElementById('p1Arrows').textContent = players[1].arrowsLeft;
+            document.getElementById('p2Arrows').textContent = players[2].arrowsLeft;
+            document.getElementById('roundInfo').textContent = `라운드 ${currentRound} / ${maxRounds}`;
+
+            // Active player panel
+            document.getElementById('p1Panel').classList.toggle('active', currentPlayer === 1);
+            document.getElementById('p2Panel').classList.toggle('active', currentPlayer === 2);
+
+            // Arrow scores
+            updateArrowScores('p1ArrowScores', players[1].currentArrows);
+            updateArrowScores('p2ArrowScores', players[2].currentArrows);
+
+            // Instructions
+            if (gameState === 'playing') {
+                document.getElementById('instructions').textContent =
+                    `Player ${currentPlayer}: 클릭하고 드래그하여 조준 → 놓으면 발사!`;
+            }
+        }
+
+        function updateArrowScores(elementId, arrows) {
+            const container = document.getElementById(elementId);
+            const divs = container.querySelectorAll('.arrow-score');
+            divs.forEach((div, i) => {
+                if (arrows[i] !== undefined) {
+                    div.textContent = arrows[i];
+                    div.classList.add('hit');
+                    div.classList.toggle('ten', arrows[i] === 10);
+                } else {
+                    div.textContent = '-';
+                    div.classList.remove('hit', 'ten');
+                }
+            });
+        }
+
+        // Main game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (gameState !== 'start' && gameState !== 'result') {
+                drawBackground();
+                drawTarget();
+                drawWindIndicator();
+                drawBow();
+                drawCrosshair();
+                drawFlyingArrow();
+                drawPlayerIndicator();
+
+                // Update arrow
+                if (gameState === 'shooting') {
+                    updateArrow();
+                }
+
+                // Update draw strength
+                if (isAiming) {
+                    const elapsed = Date.now() - aimStartTime;
+                    drawStrength = Math.min(elapsed / 20, maxDrawStrength);
+                }
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Event listeners
+        canvas.addEventListener('mousedown', (e) => {
+            if (gameState !== 'playing') return;
+
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+
+            isAiming = true;
+            aimStartTime = Date.now();
+            drawStrength = 0;
+            gameState = 'aiming';
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isAiming) return;
+
+            const rect = canvas.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+
+            // Clamp to reasonable aim area
+            mouseX = Math.max(200, Math.min(800, mouseX));
+            mouseY = Math.max(100, Math.min(450, mouseY));
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            if (gameState !== 'aiming') return;
+
+            if (drawStrength > 20) {
+                shootArrow();
+            } else {
+                isAiming = false;
+                gameState = 'playing';
+            }
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            if (gameState === 'aiming') {
+                isAiming = false;
+                drawStrength = 0;
+                gameState = 'playing';
+            }
+        });
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            document.getElementById('startScreen').style.display = 'none';
+            gameState = 'playing';
+            resetGame();
+        });
+
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            document.getElementById('resultScreen').style.display = 'none';
+            gameState = 'playing';
+            resetGame();
+        });
+
+        // Start the game
+        init();
+    </script>
+</body>
+</html>
